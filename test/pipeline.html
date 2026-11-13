@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Teste do pipeline de áudio</title>
+    <style>
+      body { font: 14px system-ui, sans-serif; padding: 24px; }
+      pre { background: #f2f2f6; padding: 12px; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <p>
+      Toca uma música sintética (Lá menor, 128 BPM) pelo mesmo caminho do <code>offscreen.js</code>:
+      AudioWorklet de captura → analisador. O som sai mudo.
+    </p>
+    <button id="play">Tocar e analisar</button>
+    <pre id="out">parado</pre>
+    <script src="../analyzer.js"></script>
+    <script src="synth.js"></script>
+    <script>
+      document.getElementById('play').onclick = async () => {
+        const out = document.getElementById('out');
+        const ctx = new AudioContext();
+        await ctx.audioWorklet.addModule('../capture-worklet.js');
+        const sr = ctx.sampleRate;
+        const data = OuvidinhoSynth.synth({
+          sr, bpm: 128, seconds: 25, tonic: 9, mode: 'minor',
+          chords: [['A', 'min'], ['D', 'min'], ['E', 'maj'], ['A', 'min']],
+        });
+        const buffer = ctx.createBuffer(2, data.length, sr);
+        buffer.copyToChannel(data, 0);
+        buffer.copyToChannel(data, 1);
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+
+        const tap = new AudioWorkletNode(ctx, 'ouvidinho-capture', {
+          numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1],
+        });
+        const mute = ctx.createGain();
+        mute.gain.value = 0;
+        source.connect(tap);
+        tap.connect(mute).connect(ctx.destination);
+
+        const analyzer = new Ouvidinho.Analyzer(sr);
+        let blocks = 0;
+        tap.port.onmessage = (e) => { blocks++; analyzer.process(e.data); };
+        source.start();
+        const t0 = performance.now();
+        const timer = setInterval(() => {
+          const r = analyzer.getResult();
+          const t = ((performance.now() - t0) / 1000).toFixed(1);
+          out.textContent =
+            `t=${t}s  taxa=${sr} Hz  blocos=${blocks}\n` +
+            `estado: ${r.state}  (escuta ${(r.progress * 100).toFixed(0)}%, palpite ${r.candidate || '-'})\n` +
+            `BPM: ${r.bpm || '-'}  (ao vivo ${r.bpmLive ? r.bpmLive.toFixed(2) : '-'})\n` +
+            `Tom: ${r.key ? `${r.key.name} ${r.key.short} ${r.key.camelot}` : '-'}\n` +
+            `nível: ${r.levelDb.toFixed(1)} dB  silêncio: ${r.silent}`;
+        }, 250);
+        source.onended = () => { clearInterval(timer); out.textContent += '\nFIM'; ctx.close(); };
+      };
+    </script>
+  </body>
+</html>

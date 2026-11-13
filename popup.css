@@ -1,0 +1,278 @@
+:root {
+  --bg: #fafaf8;
+  --ink: #171717;
+  --mute: #51514c;
+  --line: #8a8a84;
+  --error: #a11a10;
+  --focus: #0b57d0;
+  --key-white: #ffffff;
+  --key-black: #141414;
+  --key-edge: #6e6e68;
+  --tonic: #c2410c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #181818;
+    --ink: #f0f0ec;
+    --mute: #bdbdb7;
+    --line: #8a8a84;
+    --error: #ffa094;
+    --focus: #8ab4f8;
+    --key-white: #ecece7;
+    --key-black: #0a0a0a;
+    --key-edge: #0a0a0a;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --mute: var(--ink);
+    --line: var(--ink);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+body {
+  width: 22rem;
+  margin: 0;
+  padding: 0.9rem 1rem 1rem;
+  background: var(--bg);
+  color: var(--ink);
+  font: 0.9375rem/1.4 system-ui, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+p,
+h1 {
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 0.875rem;
+  color: var(--mute);
+}
+
+h1 {
+  color: var(--ink);
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.key {
+  margin-top: 0.8rem;
+  font-size: 2.25rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.key.wait {
+  color: var(--mute);
+  font-weight: 400;
+}
+
+.detail {
+  min-height: 1.4em;
+  margin-top: 0.1rem;
+  color: var(--mute);
+}
+
+.keys {
+  position: relative;
+  display: flex;
+  height: 4rem;
+  margin-top: 0.9rem;
+}
+
+.keys .w {
+  position: relative;
+  flex: 1;
+  background: var(--key-white);
+  border: 1px solid var(--key-edge);
+  border-left-width: 0;
+}
+
+.keys .w:first-child {
+  border-left-width: 1px;
+}
+
+.keys .b {
+  position: absolute;
+  top: 0;
+  width: 8.4%;
+  height: 60%;
+  background: var(--key-black);
+  transform: translateX(-50%);
+}
+
+.keys .on::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0.4rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: #141414;
+  transform: translateX(-50%);
+}
+
+.keys .b.on::after {
+  background: #ffffff;
+}
+
+.keys .tonic {
+  background: var(--tonic);
+}
+
+.keys .tonic::after {
+  width: 0.7rem;
+  height: 0.7rem;
+  background: #ffffff;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.75rem;
+  color: var(--mute);
+}
+
+.bpm b {
+  color: var(--ink);
+  font-size: 1.375rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tune {
+  font-size: 0.875rem;
+}
+
+.progress {
+  height: 4px;
+  margin-top: 0.75rem;
+  border: 1px solid var(--line);
+  visibility: hidden;
+}
+
+.progress.on {
+  visibility: visible;
+}
+
+.progress i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.25s linear;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.actions + .actions {
+  margin-top: 0.5rem;
+}
+
+button {
+  flex: 1 1 0;
+  min-height: 2.5rem;
+  padding: 0 0.6rem;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.main {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+button:hover {
+  text-decoration: underline;
+}
+
+button:disabled,
+button[aria-disabled='true'] {
+  cursor: default;
+  text-decoration: none;
+  border-style: dashed;
+  border-color: var(--mute);
+  background: transparent;
+  color: var(--mute);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.note,
+.error {
+  margin-top: 0.7rem;
+  font-size: 0.875rem;
+  color: var(--mute);
+}
+
+.error {
+  color: var(--error);
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress i {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .keys {
+    forced-color-adjust: none;
+    --key-white: #ffffff;
+    --key-black: #000000;
+    --key-edge: #000000;
+    outline: 1px solid CanvasText;
+  }
+
+  .progress {
+    border-color: CanvasText;
+  }
+
+  .progress i {
+    background: Highlight;
+    forced-color-adjust: none;
+  }
+
+  button:focus-visible {
+    outline-color: Highlight;
+  }
+}

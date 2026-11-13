@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prévia do popup</title>
+    <style>
+      body { margin: 0; padding: 24px; background: #888; font: 13px system-ui, sans-serif; }
+      nav { margin-bottom: 12px; }
+      nav a { color: #fff; margin-right: 12px; }
+      iframe { width: 22rem; border: 0; display: block; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35); background: #fff; }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <a href="?cenario=padrao">padrão</a>
+      <a href="?cenario=outra-aba">ouvindo outra aba</a>
+      <a href="?cenario=erro">erro (chrome://)</a>
+    </nav>
+    <iframe id="popup" title="popup" scrolling="no"></iframe>
+    <script>
+      const frame = document.getElementById('popup');
+      fetch('../popup.html')
+        .then((r) => r.text())
+        .then((html) => {
+          const root = new URL('../', location.href).href;
+          html = html
+            .replace('<head>', `<head><base href="${root}">`)
+            .replace(
+              '<script src="popup.js"><\/script>',
+              '<script src="analyzer.js"><\/script><script src="test/synth.js"><\/script>' +
+                '<script src="test/chrome-mock.js"><\/script><script src="popup.js"><\/script>',
+            );
+          frame.srcdoc = html;
+        });
+      setInterval(() => {
+        const body = frame.contentDocument && frame.contentDocument.body;
+        if (body) frame.style.height = body.scrollHeight + 'px';
+      }, 200);
+    </script>
+  </body>
+</html>

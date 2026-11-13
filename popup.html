@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ouvidinho</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Ouvidinho</h1>
+      <span id="status"></span>
+    </header>
+
+    <main>
+      <p class="key wait" id="key">—</p>
+      <p class="detail" id="detail"></p>
+
+      <div class="keys" id="keys" role="img" aria-label="Teclado: nenhuma escala definida"></div>
+
+      <p class="row">
+        <span class="bpm" id="bpm">— BPM</span>
+        <span class="tune" id="tune"></span>
+      </p>
+
+      <div class="progress" id="progress" aria-hidden="true"><i id="bar"></i></div>
+
+      <div class="actions" id="outputs" hidden>
+        <button id="copyBtn" type="button">Copiar</button>
+        <button id="midiBtn" type="button" title="Baixa a escala em MIDI, no BPM detectado, para arrastar ao FL Studio, Ableton ou outra DAW">Baixar MIDI</button>
+      </div>
+
+      <div class="actions">
+        <button class="main" id="startBtn" type="button">Ouvir esta aba</button>
+        <button id="againBtn" type="button" hidden>Ouvir de novo</button>
+        <button id="stopBtn" type="button" hidden>Parar</button>
+      </div>
+
+      <p class="note" id="note" hidden></p>
+      <p class="error" id="error" role="alert" hidden></p>
+    </main>
+
+    <p class="sr" id="live" role="status" aria-live="polite"></p>
+
+    <script src="midi.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

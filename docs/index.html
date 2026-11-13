@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0a0a">
+<title>ouvidinho — bonbap</title>
+<meta name="description" content="Extensão para Chrome que ouve a música da aba e define o tom e o BPM. Download e manual de instalação.">
+<link rel="canonical" href="https://bonbap.com.br/ouvidinho/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ouvidinho — bonbap">
+<meta property="og:description" content="Extensão para Chrome que ouve a música da aba e define o tom e o BPM.">
+<meta property="og:url" content="https://bonbap.com.br/ouvidinho/">
+<meta property="og:locale" content="pt_BR">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231c1c1c'/><g stroke-width='2.8' stroke-linecap='round'><path d='M6.4 13v6M11.2 10v12M20.8 10v12M25.6 13v6' stroke='%23f2f2ee'/><path d='M16 6.8v18.4' stroke='%23f76b1c'/></g></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;700;800&display=swap">
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+  --solid: #cfcfcf;
+  --dim: #464646;
+  --muted: #8a8a8a;
+  --line: rgba(255, 255, 255, .09);
+  --pad: clamp(1.25rem, 4vw, 3rem);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--fg);
+  font: 500 16px/1.5 "Inter Tight", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.layer { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+
+.layer--glow {
+  background: radial-gradient(42rem 42rem at var(--mx, 50%) var(--my, 30%),
+              rgba(255, 255, 255, .055), transparent 62%);
+}
+
+.layer--grain {
+  opacity: .035;
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+}
+
+.small {
+  font-size: .68rem;
+  font-weight: 500;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+a.small {
+  text-decoration: none;
+  transition: color .3s ease;
+}
+
+a.small:hover, a.small:focus-visible { color: var(--fg); }
+
+.top { padding: clamp(.9rem, 2.2vh, 1.6rem) var(--pad) 0; }
+
+main { flex: 1; }
+
+.mark {
+  padding: clamp(.75rem, 2.5vh, 2.5rem) 0 0;
+  overflow: hidden;
+}
+
+.mark h1 {
+  display: block;
+  width: max-content;
+  margin: 0;
+  white-space: nowrap;
+  line-height: .74;
+  letter-spacing: -.035em;
+  font-size: 21vw;
+  font-weight: 800;
+  color: var(--solid);
+}
+
+.lede {
+  max-width: 34em;
+  margin: clamp(1.5rem, 4vh, 3rem) 0 0;
+  padding: 0 var(--pad);
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.3;
+  letter-spacing: -.01em;
+}
+
+.get {
+  margin-top: clamp(1.5rem, 4vh, 3rem);
+  padding: 0 var(--pad);
+}
+
+.door {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(.8rem, 1.6vh, 1.4rem) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  text-decoration: none;
+  font-size: clamp(1.05rem, min(3vw, 3.6vh), 2.05rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  text-transform: uppercase;
+}
+
+.door:focus-visible { outline: none; }
+.door:focus-visible .label { text-decoration: underline; text-underline-offset: .35em; }
+
+.label { transition: transform .5s var(--ease); }
+.door:hover .label, .door:focus-visible .label { transform: translateX(clamp(4px, .8vw, 12px)); }
+
+.arr {
+  flex: none;
+  font-size: .8em;
+  transition: transform .5s var(--ease);
+}
+
+.door:hover .arr, .door:focus-visible .arr { transform: translateY(.2em); }
+
+.get .small { margin: .75rem 0 0; }
+
+.block {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: clamp(2.25rem, 7vh, 4.5rem) var(--pad) 0;
+}
+
+.block h2 {
+  margin: 0;
+  padding-top: 1.1rem;
+  font-weight: 700;
+}
+
+.rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  border-bottom: 1px solid var(--line);
+}
+
+.rows li {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  padding: .85rem 0;
+  border-top: 1px solid var(--line);
+  color: var(--solid);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.45;
+}
+
+ol.rows li::before {
+  counter-increment: step;
+  content: counter(step, decimal-leading-zero);
+  padding-top: .25em;
+  color: var(--muted);
+  font-size: .75em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .08em;
+}
+
+ul.rows li { grid-template-columns: minmax(6.5rem, 10rem) minmax(0, 1fr); gap: 1rem; }
+
+.rows b, .rows strong {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+code {
+  padding: .1em .4em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--fg);
+  font: .88em/1 ui-monospace, "Cascadia Mono", Consolas, Menlo, monospace;
+  white-space: nowrap;
+}
+
+.block p {
+  max-width: 44em;
+  margin: .9rem 0 0;
+}
+
+footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: clamp(2.5rem, 8vh, 5rem);
+  padding: clamp(.6rem, 1.5vh, 1.4rem) var(--pad);
+}
+
+:focus-visible { outline: 2px solid var(--muted); outline-offset: 3px; }
+
+@media (max-width: 47.999rem) {
+  .block { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
+  .block h2 { padding: 0 0 .6rem; }
+  ul.rows li { grid-template-columns: minmax(0, 1fr); gap: .1rem; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise 1s var(--ease) backwards; animation-delay: var(--d, 0s); }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+}
+</style>
+</head>
+
+<body>
+  <div class="layer layer--glow"></div>
+  <div class="layer layer--grain"></div>
+
+  <header class="top">
+    <a class="small" href="https://bonbap.com.br/">&larr; bonbap</a>
+  </header>
+
+  <main>
+    <div class="mark reveal">
+      <h1 data-fit>ouvidinho</h1>
+    </div>
+
+    <p class="lede reveal" style="--d:.15s">
+      Extensão para Chrome que ouve a música tocando na aba e define o tom e o BPM.
+      Escuta, decide e não fica mudando.
+    </p>
+
+    <div class="get reveal" style="--d:.25s">
+      <a class="door" href="https://github.com/henribon/ouvidinho/releases/latest/download/ouvidinho.zip">
+        <span class="label">Baixar a extensão</span>
+        <span class="arr" aria-hidden="true">&#8595;</span>
+      </a>
+      <p class="small">Arquivo .zip, grátis &middot; Chrome, Edge, Brave, Opera e Vivaldi</p>
+    </div>
+
+    <section class="block" aria-labelledby="instalar">
+      <h2 class="small" id="instalar">Instalação</h2>
+      <div>
+        <ol class="rows">
+          <li><span>Baixe o arquivo e <strong>extraia o .zip</strong>. No Windows: botão direito, Extrair tudo. Vai aparecer uma pasta chamada <code>ouvidinho</code>.</span></li>
+          <li><span>No navegador, digite <code>chrome://extensions</code> na barra de endereço. No Edge é <code>edge://extensions</code>.</span></li>
+          <li><span>Ligue o <strong>Modo do desenvolvedor</strong>, no canto superior direito da página.</span></li>
+          <li><span>Clique em <strong>Carregar sem compactação</strong> e escolha a pasta <code>ouvidinho</code>.</span></li>
+          <li><span>Fixe o ícone na barra: clique na peça de quebra-cabeça e no alfinete ao lado de Ouvidinho.</span></li>
+        </ol>
+        <p class="small">Guarde a pasta num lugar fixo: o navegador carrega a extensão a partir dela.</p>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="usar">
+      <h2 class="small" id="usar">Como usar</h2>
+      <ol class="rows">
+        <li><span>Abra uma aba com música (YouTube, SoundCloud, Bandcamp, rádio online) e dê play.</span></li>
+        <li><span>Clique no ícone do Ouvidinho e em <strong>Ouvir esta aba</strong>. O som continua tocando normalmente.</span></li>
+        <li><span>Espere de 16 a 32 segundos. O tom aparece e fica parado; o BPM também.</span></li>
+        <li><span>Trocou de música? Depois de um silêncio ele confere sozinho. Para refazer na hora, <strong>Ouvir de novo</strong>.</span></li>
+      </ol>
+    </section>
+
+    <section class="block" aria-labelledby="mostra">
+      <h2 class="small" id="mostra">O que ele mostra</h2>
+      <ul class="rows">
+        <li><b>Tom</b><span>Nome, cifra, notação Camelot e a relativa. Exemplo: Si menor, Bm, 10A, relativa Ré maior.</span></li>
+        <li><b>Escala</b><span>As sete notas marcadas num teclado, com a tônica em destaque.</span></li>
+        <li><b>BPM</b><span>Um número inteiro, que também se firma e não fica pulando.</span></li>
+        <li><b>Afinação</b><span>Avisa quando a gravação não está em Lá = 440 Hz.</span></li>
+        <li><b>MIDI</b><span>Baixa a escala num arquivo .mid, no BPM detectado, para arrastar ao FL Studio, Ableton ou outra DAW.</span></li>
+        <li><b>Copiar</b><span>Leva o resultado como texto, por exemplo <code>Bm (10A) · 74 BPM</code>.</span></li>
+      </ul>
+    </section>
+
+    <section class="block" aria-labelledby="saber">
+      <h2 class="small" id="saber">Bom saber</h2>
+      <ul class="rows">
+        <li><b>Privacidade</b><span>O áudio é analisado no seu computador. Nada é gravado nem enviado para lugar nenhum.</span></li>
+        <li><b>Acessibilidade</b><span>Funciona com leitor de tela e só com teclado. <code>Alt+Shift+O</code> abre a extensão.</span></li>
+        <li><b>Navegadores</b><span>Chrome 116 ou mais novo e os baseados nele. No Firefox não funciona.</span></li>
+        <li><b>Limites</b><span>Às vezes confunde o tom com o relativo (Ré maior e Si menor) e o BPM com a metade ou o dobro. Não ouve páginas internas do navegador.</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <a class="small" href="https://github.com/henribon/ouvidinho">código no github &#8599;</a>
+  </footer>
+
+<script>
+(() => {
+  const BASE_FONT_SIZE = 200;
+  const GLOW_EASING = .07;
+  const GLOW_REST_DISTANCE = .1;
+
+  const title = document.querySelector('[data-fit]');
+  const glow = document.querySelector('.layer--glow');
+
+  const fitTitle = () => {
+    const available = title.parentElement.clientWidth;
+    title.style.fontSize = `${BASE_FONT_SIZE}px`;
+    const natural = title.getBoundingClientRect().width;
+    if (available && natural) title.style.fontSize = `${(BASE_FONT_SIZE * available / natural).toFixed(2)}px`;
+  };
+
+  const oncePerFrame = (task) => {
+    let scheduled = false;
+    return () => {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        task();
+      });
+    };
+  };
+
+  const followPointer = () => {
+    const target = { x: 50, y: 30 };
+    const current = { x: 50, y: 30 };
+    let frame = null;
+
+    const step = () => {
+      current.x += (target.x - current.x) * GLOW_EASING;
+      current.y += (target.y - current.y) * GLOW_EASING;
+      glow.style.setProperty('--mx', `${current.x.toFixed(2)}%`);
+      glow.style.setProperty('--my', `${current.y.toFixed(2)}%`);
+      const moving = Math.abs(target.x - current.x) > GLOW_REST_DISTANCE || Math.abs(target.y - current.y) > GLOW_REST_DISTANCE;
+      frame = moving ? requestAnimationFrame(step) : null;
+    };
+
+    addEventListener('pointermove', (event) => {
+      target.x = event.clientX / innerWidth * 100;
+      target.y = event.clientY / innerHeight * 100;
+      if (!frame) frame = requestAnimationFrame(step);
+    }, { passive: true });
+  };
+
+  fitTitle();
+  document.fonts?.ready.then(fitTitle);
+  addEventListener('resize', oncePerFrame(fitTitle));
+  followPointer();
+})();
+</script>
+</body>
+</html>
