@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0a0a0a">
 <title>ouvidinho — bonbap</title>
-<meta name="description" content="Extensão para Chrome que ouve a música da aba e define o tom e o BPM. Download e manual de instalação.">
+<meta name="description" content="Extensão para Chrome que descobre o tom e o BPM da música que está tocando na aba. Download e instalação passo a passo.">
 <link rel="canonical" href="https://bonbap.com.br/ouvidinho/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ouvidinho — bonbap">
-<meta property="og:description" content="Extensão para Chrome que ouve a música da aba e define o tom e o BPM.">
+<meta property="og:description" content="Descobre o tom e o BPM da música que está tocando na aba do Chrome.">
 <meta property="og:url" content="https://bonbap.com.br/ouvidinho/">
+<meta property="og:image" content="https://bonbap.com.br/ouvidinho/img/popup-definido.webp">
 <meta property="og:locale" content="pt_BR">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%231c1c1c'/><g stroke-width='2.8' stroke-linecap='round'><path d='M6.4 13v6M11.2 10v12M20.8 10v12M25.6 13v6' stroke='%23f2f2ee'/><path d='M16 6.8v18.4' stroke='%23f76b1c'/></g></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +24,6 @@
   --bg: #0a0a0a;
   --fg: #fafafa;
   --solid: #cfcfcf;
-  --dim: #464646;
   --muted: #8a8a8a;
   --line: rgba(255, 255, 255, .09);
   --pad: clamp(1.25rem, 4vw, 3rem);
@@ -44,6 +44,14 @@ body {
   overflow-x: hidden;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
 .layer { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
 
 .layer--glow {
@@ -57,6 +65,7 @@ body {
 }
 
 .small {
+  margin: 0;
   font-size: .68rem;
   font-weight: 500;
   letter-spacing: .14em;
@@ -93,7 +102,7 @@ main { flex: 1; }
 }
 
 .lede {
-  max-width: 34em;
+  max-width: 30em;
   margin: clamp(1.5rem, 4vh, 3rem) 0 0;
   padding: 0 var(--pad);
   font-size: clamp(1.15rem, 2.2vw, 1.6rem);
@@ -137,52 +146,68 @@ main { flex: 1; }
 
 .door:hover .arr, .door:focus-visible .arr { transform: translateY(.2em); }
 
-.get .small { margin: .75rem 0 0; }
+.get .small { margin-top: .75rem; }
 
-.block {
+.shots {
   display: grid;
-  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
-  gap: 1.5rem;
-  padding: clamp(2.25rem, 7vh, 4.5rem) var(--pad) 0;
+  grid-template-columns: repeat(3, minmax(0, 22rem));
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-items: end;
+  margin: clamp(2rem, 6vh, 4rem) 0 0;
+  padding: 0 var(--pad);
 }
 
-.block h2 {
-  margin: 0;
-  padding-top: 1.1rem;
-  font-weight: 700;
-}
+figure { margin: 0; }
 
-.rows {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: step;
-  border-bottom: 1px solid var(--line);
-}
-
-.rows li {
-  display: grid;
-  grid-template-columns: 2.75rem minmax(0, 1fr);
-  padding: .85rem 0;
-  border-top: 1px solid var(--line);
+figcaption {
+  display: flex;
+  gap: .75rem;
+  margin-top: .8rem;
   color: var(--solid);
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  line-height: 1.45;
+  line-height: 1.35;
 }
 
-ol.rows li::before {
-  counter-increment: step;
-  content: counter(step, decimal-leading-zero);
-  padding-top: .25em;
+.n {
+  flex: none;
+  padding-top: .3em;
   color: var(--muted);
   font-size: .75em;
   font-variant-numeric: tabular-nums;
   letter-spacing: .08em;
 }
 
-ul.rows li { grid-template-columns: minmax(6.5rem, 10rem) minmax(0, 1fr); gap: 1rem; }
+.block {
+  display: grid;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: clamp(2.5rem, 8vh, 5rem) var(--pad) 0;
+}
 
-.rows b, .rows strong {
+.block h2 { padding-top: 1.1rem; font-weight: 700; }
+
+.steps {
+  max-width: 45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  padding: 1rem 0 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--solid);
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.45;
+}
+
+.steps p { margin: 0; }
+
+.steps img { margin-top: .9rem; }
+
+.steps strong {
   color: var(--fg);
   font-weight: 700;
 }
@@ -196,10 +221,7 @@ code {
   white-space: nowrap;
 }
 
-.block p {
-  max-width: 44em;
-  margin: .9rem 0 0;
-}
+.block .small { margin-top: .9rem; }
 
 footer {
   display: flex;
@@ -211,9 +233,9 @@ footer {
 :focus-visible { outline: 2px solid var(--muted); outline-offset: 3px; }
 
 @media (max-width: 47.999rem) {
+  .shots { grid-template-columns: minmax(0, 22rem); }
   .block { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
   .block h2 { padding: 0 0 .6rem; }
-  ul.rows li { grid-template-columns: minmax(0, 1fr); gap: .1rem; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -237,8 +259,7 @@ footer {
     </div>
 
     <p class="lede reveal" style="--d:.15s">
-      Extensão para Chrome que ouve a música tocando na aba e define o tom e o BPM.
-      Escuta, decide e não fica mudando.
+      Descobre o tom e o BPM da música que está tocando na aba do Chrome.
     </p>
 
     <div class="get reveal" style="--d:.25s">
@@ -246,53 +267,56 @@ footer {
         <span class="label">Baixar a extensão</span>
         <span class="arr" aria-hidden="true">&#8595;</span>
       </a>
-      <p class="small">Arquivo .zip, grátis &middot; Chrome, Edge, Brave, Opera e Vivaldi</p>
+      <p class="small">Arquivo .zip, grátis &middot; Chrome, Edge, Brave e Opera</p>
+    </div>
+
+    <div class="shots reveal" style="--d:.35s">
+      <figure>
+        <img src="img/popup-idle.webp" width="704" height="608" alt="Janela do Ouvidinho com o botão Ouvir esta aba.">
+        <figcaption><span class="n">01</span><span>Dê play na música e clique em Ouvir esta aba.</span></figcaption>
+      </figure>
+      <figure>
+        <img src="img/popup-ouvindo.webp" width="704" height="736" alt="Ouvidinho ouvindo: definindo o tom, faltam 18 segundos.">
+        <figcaption><span class="n">02</span><span>Ele escuta por uns 20 segundos.</span></figcaption>
+      </figure>
+      <figure>
+        <img src="img/popup-definido.webp" width="704" height="736" alt="Tom definido: Lá menor, 128 BPM, com a escala marcada no teclado.">
+        <figcaption><span class="n">03</span><span>O tom e o BPM aparecem e ficam.</span></figcaption>
+      </figure>
     </div>
 
     <section class="block" aria-labelledby="instalar">
       <h2 class="small" id="instalar">Instalação</h2>
       <div>
-        <ol class="rows">
-          <li><span>Baixe o arquivo e <strong>extraia o .zip</strong>. No Windows: botão direito, Extrair tudo. Vai aparecer uma pasta chamada <code>ouvidinho</code>.</span></li>
-          <li><span>No navegador, digite <code>chrome://extensions</code> na barra de endereço. No Edge é <code>edge://extensions</code>.</span></li>
-          <li><span>Ligue o <strong>Modo do desenvolvedor</strong>, no canto superior direito da página.</span></li>
-          <li><span>Clique em <strong>Carregar sem compactação</strong> e escolha a pasta <code>ouvidinho</code>.</span></li>
-          <li><span>Fixe o ícone na barra: clique na peça de quebra-cabeça e no alfinete ao lado de Ouvidinho.</span></li>
+        <ol class="steps">
+          <li>
+            <span class="n">01</span>
+            <p>Extraia o <strong>.zip</strong> que você baixou. Fica uma pasta chamada <code>ouvidinho</code>.</p>
+          </li>
+          <li>
+            <span class="n">02</span>
+            <div>
+              <p>Abra <code>chrome://extensions</code> e ligue o <strong>Modo do desenvolvedor</strong>.</p>
+              <img src="img/instalar-modo-desenvolvedor.webp" width="1360" height="152" loading="lazy" decoding="async" alt="Canto superior direito da página de extensões, com o interruptor Modo do desenvolvedor em destaque.">
+            </div>
+          </li>
+          <li>
+            <span class="n">03</span>
+            <div>
+              <p>Clique em <strong>Carregar sem compactação</strong> e escolha a pasta <code>ouvidinho</code>.</p>
+              <img src="img/instalar-carregar.webp" width="1360" height="230" loading="lazy" decoding="async" alt="Página de extensões com o botão Carregar sem compactação em destaque, no canto superior esquerdo.">
+            </div>
+          </li>
+          <li>
+            <span class="n">04</span>
+            <div>
+              <p>Pronto. O Ouvidinho aparece na lista e o ícone fica na barra do navegador.</p>
+              <img src="img/instalar-pronto.webp" width="1360" height="640" loading="lazy" decoding="async" alt="Cartão do Ouvidinho, versão 1.1.0, na lista de extensões instaladas.">
+            </div>
+          </li>
         </ol>
         <p class="small">Guarde a pasta num lugar fixo: o navegador carrega a extensão a partir dela.</p>
       </div>
-    </section>
-
-    <section class="block" aria-labelledby="usar">
-      <h2 class="small" id="usar">Como usar</h2>
-      <ol class="rows">
-        <li><span>Abra uma aba com música (YouTube, SoundCloud, Bandcamp, rádio online) e dê play.</span></li>
-        <li><span>Clique no ícone do Ouvidinho e em <strong>Ouvir esta aba</strong>. O som continua tocando normalmente.</span></li>
-        <li><span>Espere de 16 a 32 segundos. O tom aparece e fica parado; o BPM também.</span></li>
-        <li><span>Trocou de música? Depois de um silêncio ele confere sozinho. Para refazer na hora, <strong>Ouvir de novo</strong>.</span></li>
-      </ol>
-    </section>
-
-    <section class="block" aria-labelledby="mostra">
-      <h2 class="small" id="mostra">O que ele mostra</h2>
-      <ul class="rows">
-        <li><b>Tom</b><span>Nome, cifra, notação Camelot e a relativa. Exemplo: Si menor, Bm, 10A, relativa Ré maior.</span></li>
-        <li><b>Escala</b><span>As sete notas marcadas num teclado, com a tônica em destaque.</span></li>
-        <li><b>BPM</b><span>Um número inteiro, que também se firma e não fica pulando.</span></li>
-        <li><b>Afinação</b><span>Avisa quando a gravação não está em Lá = 440 Hz.</span></li>
-        <li><b>MIDI</b><span>Baixa a escala num arquivo .mid, no BPM detectado, para arrastar ao FL Studio, Ableton ou outra DAW.</span></li>
-        <li><b>Copiar</b><span>Leva o resultado como texto, por exemplo <code>Bm (10A) · 74 BPM</code>.</span></li>
-      </ul>
-    </section>
-
-    <section class="block" aria-labelledby="saber">
-      <h2 class="small" id="saber">Bom saber</h2>
-      <ul class="rows">
-        <li><b>Privacidade</b><span>O áudio é analisado no seu computador. Nada é gravado nem enviado para lugar nenhum.</span></li>
-        <li><b>Acessibilidade</b><span>Funciona com leitor de tela e só com teclado. <code>Alt+Shift+O</code> abre a extensão.</span></li>
-        <li><b>Navegadores</b><span>Chrome 116 ou mais novo e os baseados nele. No Firefox não funciona.</span></li>
-        <li><b>Limites</b><span>Às vezes confunde o tom com o relativo (Ré maior e Si menor) e o BPM com a metade ou o dobro. Não ouve páginas internas do navegador.</span></li>
-      </ul>
     </section>
   </main>
 
