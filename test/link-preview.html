@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Prévia do link</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;800&display=swap">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --fg: #fafafa;
+  --solid: #cfcfcf;
+  --muted: #8a8a8a;
+  --line: rgba(255, 255, 255, .09);
+  --pad: 64px;
+}
+
+html, body { margin: 0; }
+
+body {
+  box-sizing: border-box;
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--pad);
+  padding: var(--pad);
+  background: var(--bg);
+  color: var(--fg);
+  font: 500 20px/1.3 "Inter Tight", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.small {
+  margin: 0;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0 0 0 -.04em;
+  font-size: 106px;
+  font-weight: 800;
+  line-height: .9;
+  letter-spacing: -.035em;
+  color: var(--solid);
+}
+
+.lede {
+  margin: 28px 0 0;
+  font-size: 38px;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+}
+
+img {
+  display: block;
+  width: 480px;
+  height: 502px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+  <div class="text">
+    <p class="small">bonbap</p>
+    <div>
+      <h1>ouvidinho</h1>
+      <p class="lede">Descobre o tom e o BPM da música que está tocando na aba.</p>
+    </div>
+    <p class="small">Extensão grátis para Chrome</p>
+  </div>
+  <img src="../docs/img/popup-definido.webp" alt="">
+</body>
+</html>
