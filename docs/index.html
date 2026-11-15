@@ -142,7 +142,9 @@ main { flex: 1; }
 .door:focus-visible .label { text-decoration: underline; text-underline-offset: .35em; }
 
 .label { transition: transform .5s var(--ease); }
-.door:hover .label, .door:focus-visible .label { transform: translateX(clamp(4px, .8vw, 12px)); }
+
+.door:hover .label, .door:focus-visible .label,
+.fold summary:hover .label, .fold summary:focus-visible .label { transform: translateX(clamp(4px, .8vw, 12px)); }
 
 .arr {
   flex: none;
@@ -154,23 +156,47 @@ main { flex: 1; }
 
 .get .small { margin-top: .75rem; }
 
-.shots {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 22rem));
-  gap: clamp(1rem, 2.5vw, 2rem);
-  align-items: end;
-  margin: clamp(2rem, 6vh, 4rem) 0 0;
+.folds {
+  margin-top: clamp(2.5rem, 8vh, 5rem);
   padding: 0 var(--pad);
 }
 
-figure { margin: 0; }
+.fold { border-top: 1px solid var(--line); }
+.fold:last-child { border-bottom: 1px solid var(--line); }
 
-figcaption {
+.fold summary {
   display: flex;
-  gap: .75rem;
-  margin-top: .8rem;
-  color: var(--solid);
-  line-height: 1.35;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(.9rem, 1.8vh, 1.3rem) 0;
+  list-style: none;
+  cursor: pointer;
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+}
+
+.fold summary::-webkit-details-marker { display: none; }
+.fold summary:focus-visible { outline: none; }
+.fold summary:focus-visible .label { text-decoration: underline; text-underline-offset: .35em; }
+
+.fold h2 { margin: 0; font: inherit; }
+
+.sign {
+  flex: none;
+  font-weight: 500;
+  transition: transform .5s var(--ease);
+}
+
+.fold[open] .sign { transform: rotate(45deg); }
+
+.fold-body {
+  max-width: 45rem;
+  margin-left: 15.5rem;
+  padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
 }
 
 .n {
@@ -182,36 +208,28 @@ figcaption {
   letter-spacing: .08em;
 }
 
-.block {
-  display: grid;
-  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
-  gap: 1.5rem;
-  padding: clamp(2.5rem, 8vh, 5rem) var(--pad) 0;
-}
-
-.block h2 { padding-top: 1.1rem; font-weight: 700; }
-
 .steps {
-  max-width: 45rem;
   margin: 0;
   padding: 0;
   list-style: none;
-  border-bottom: 1px solid var(--line);
 }
 
 .steps li {
   display: grid;
   grid-template-columns: 2.5rem minmax(0, 1fr);
   padding: 1rem 0 1.25rem;
-  border-top: 1px solid var(--line);
   color: var(--solid);
   font-size: clamp(1rem, 1.5vw, 1.15rem);
   line-height: 1.45;
 }
 
+.steps li + li { border-top: 1px solid var(--line); }
+
 .steps p { margin: 0; }
 
 .steps img { margin-top: .9rem; }
+
+.steps .popup { width: min(100%, 20rem); }
 
 .steps strong {
   color: var(--fg);
@@ -227,7 +245,10 @@ code {
   white-space: nowrap;
 }
 
-.block .small { margin-top: .9rem; }
+.fold-body .small {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
 
 footer {
   display: flex;
@@ -239,12 +260,20 @@ footer {
 :focus-visible { outline: 2px solid var(--muted); outline-offset: 3px; }
 
 @media (max-width: 47.999rem) {
-  .shots { grid-template-columns: minmax(0, 22rem); }
-  .block { grid-template-columns: minmax(0, 1fr); gap: .25rem; }
-  .block h2 { padding: 0 0 .6rem; }
+  .fold-body { margin-left: 0; }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  :root { interpolate-size: allow-keywords; }
+
+  .fold::details-content {
+    height: 0;
+    overflow: clip;
+    transition: height .5s var(--ease), content-visibility .5s allow-discrete;
+  }
+
+  .fold[open]::details-content { height: auto; }
+
   .reveal { animation: rise 1s var(--ease) backwards; animation-delay: var(--d, 0s); }
   @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 }
@@ -276,54 +305,76 @@ footer {
       <p class="small">Arquivo .zip, grátis &middot; Chrome, Edge, Brave e Opera</p>
     </div>
 
-    <div class="shots reveal" style="--d:.35s">
-      <figure>
-        <img src="img/popup-idle.webp" width="704" height="608" alt="Janela do Ouvidinho com o botão Ouvir esta aba.">
-        <figcaption><span class="n">01</span><span>Dê play na música e clique em Ouvir esta aba.</span></figcaption>
-      </figure>
-      <figure>
-        <img src="img/popup-ouvindo.webp" width="704" height="736" alt="Ouvidinho ouvindo: definindo o tom, faltam 18 segundos.">
-        <figcaption><span class="n">02</span><span>Ele escuta por uns 20 segundos.</span></figcaption>
-      </figure>
-      <figure>
-        <img src="img/popup-definido.webp" width="704" height="736" alt="Tom definido: Lá menor, 128 BPM, com a escala marcada no teclado.">
-        <figcaption><span class="n">03</span><span>O tom e o BPM aparecem e ficam.</span></figcaption>
-      </figure>
-    </div>
+    <div class="folds reveal" style="--d:.35s">
+      <details class="fold">
+        <summary>
+          <h2 class="label">Instalação</h2>
+          <span class="sign" aria-hidden="true">+</span>
+        </summary>
+        <div class="fold-body">
+          <ol class="steps">
+            <li>
+              <span class="n">01</span>
+              <p>Extraia o <strong>.zip</strong> que você baixou. Fica uma pasta chamada <code>ouvidinho</code>.</p>
+            </li>
+            <li>
+              <span class="n">02</span>
+              <div>
+                <p>Abra <code>chrome://extensions</code> e ligue o <strong>Modo do desenvolvedor</strong>.</p>
+                <img src="img/instalar-modo-desenvolvedor.webp" width="1360" height="152" loading="lazy" decoding="async" alt="Canto superior direito da página de extensões, com o interruptor Modo do desenvolvedor em destaque.">
+              </div>
+            </li>
+            <li>
+              <span class="n">03</span>
+              <div>
+                <p>Clique em <strong>Carregar sem compactação</strong> e escolha a pasta <code>ouvidinho</code>.</p>
+                <img src="img/instalar-carregar.webp" width="1360" height="230" loading="lazy" decoding="async" alt="Página de extensões com o botão Carregar sem compactação em destaque, no canto superior esquerdo.">
+              </div>
+            </li>
+            <li>
+              <span class="n">04</span>
+              <div>
+                <p>Pronto. O Ouvidinho aparece na lista e o ícone fica na barra do navegador.</p>
+                <img src="img/instalar-pronto.webp" width="1360" height="640" loading="lazy" decoding="async" alt="Cartão do Ouvidinho, versão 1.1.0, na lista de extensões instaladas.">
+              </div>
+            </li>
+          </ol>
+          <p class="small">Guarde a pasta num lugar fixo: o navegador carrega a extensão a partir dela.</p>
+        </div>
+      </details>
 
-    <section class="block" aria-labelledby="instalar">
-      <h2 class="small" id="instalar">Instalação</h2>
-      <div>
-        <ol class="steps">
-          <li>
-            <span class="n">01</span>
-            <p>Extraia o <strong>.zip</strong> que você baixou. Fica uma pasta chamada <code>ouvidinho</code>.</p>
-          </li>
-          <li>
-            <span class="n">02</span>
-            <div>
-              <p>Abra <code>chrome://extensions</code> e ligue o <strong>Modo do desenvolvedor</strong>.</p>
-              <img src="img/instalar-modo-desenvolvedor.webp" width="1360" height="152" loading="lazy" decoding="async" alt="Canto superior direito da página de extensões, com o interruptor Modo do desenvolvedor em destaque.">
-            </div>
-          </li>
-          <li>
-            <span class="n">03</span>
-            <div>
-              <p>Clique em <strong>Carregar sem compactação</strong> e escolha a pasta <code>ouvidinho</code>.</p>
-              <img src="img/instalar-carregar.webp" width="1360" height="230" loading="lazy" decoding="async" alt="Página de extensões com o botão Carregar sem compactação em destaque, no canto superior esquerdo.">
-            </div>
-          </li>
-          <li>
-            <span class="n">04</span>
-            <div>
-              <p>Pronto. O Ouvidinho aparece na lista e o ícone fica na barra do navegador.</p>
-              <img src="img/instalar-pronto.webp" width="1360" height="640" loading="lazy" decoding="async" alt="Cartão do Ouvidinho, versão 1.1.0, na lista de extensões instaladas.">
-            </div>
-          </li>
-        </ol>
-        <p class="small">Guarde a pasta num lugar fixo: o navegador carrega a extensão a partir dela.</p>
-      </div>
-    </section>
+      <details class="fold">
+        <summary>
+          <h2 class="label">Como usar</h2>
+          <span class="sign" aria-hidden="true">+</span>
+        </summary>
+        <div class="fold-body">
+          <ol class="steps">
+            <li>
+              <span class="n">01</span>
+              <div>
+                <p>Dê play na música e clique em <strong>Ouvir esta aba</strong>.</p>
+                <img class="popup" src="img/popup-idle.webp" width="704" height="608" loading="lazy" decoding="async" alt="Janela do Ouvidinho com o botão Ouvir esta aba.">
+              </div>
+            </li>
+            <li>
+              <span class="n">02</span>
+              <div>
+                <p>Ele escuta por uns <strong>20 segundos</strong>.</p>
+                <img class="popup" src="img/popup-ouvindo.webp" width="704" height="736" loading="lazy" decoding="async" alt="Ouvidinho ouvindo: definindo o tom, faltam 18 segundos.">
+              </div>
+            </li>
+            <li>
+              <span class="n">03</span>
+              <div>
+                <p>O <strong>tom</strong> e o <strong>BPM</strong> aparecem e ficam.</p>
+                <img class="popup" src="img/popup-definido.webp" width="704" height="736" loading="lazy" decoding="async" alt="Tom definido: Lá menor, 128 BPM, com a escala marcada no teclado.">
+              </div>
+            </li>
+          </ol>
+        </div>
+      </details>
+    </div>
   </main>
 
   <footer>
